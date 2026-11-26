@@ -34,6 +34,8 @@ export class ProductosService {
   readonly total = computed(() => this._productos().length);
   readonly unidades = computed(() => this._productos().reduce((suma, p) => suma + p.stock, 0));
   readonly valorInventario = computed(() => this._productos().reduce((suma, p) => suma + p.precio * p.stock, 0));
+  /** Reto 3: cuántos productos tienen stock menor a 5 */
+  readonly stockBajo = computed(() => this._productos().filter((p) => p.stock < 5).length);
 
   private cargado = false;
 

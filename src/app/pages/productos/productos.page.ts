@@ -9,13 +9,13 @@ import { RouterLink } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonSearchbar, IonList, IonItem, IonItemSliding, IonItemOptions,
   IonItemOption, IonLabel, IonBadge, IonIcon, IonFab, IonFabButton, IonRefresher, IonRefresherContent, IonNote,
-  AlertController, ToastController,
+  IonSegment, IonSegmentButton, IonButtons, IonButton, AlertController, ToastController,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { add, trash, cubeOutline } from 'ionicons/icons';
+import { add, trash, cubeOutline, swapVertical } from 'ionicons/icons';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { ProductosService } from '../../services/productos.service';
-import { Producto } from '../../models/producto';
+import { CATEGORIAS, Categoria, Producto } from '../../models/producto';
 
 @Component({
   selector: 'app-productos',
@@ -23,7 +23,7 @@ import { Producto } from '../../models/producto';
   styleUrls: ['./productos.page.scss'],
   imports: [CurrencyPipe, RouterLink, IonHeader, IonToolbar, IonTitle, IonContent, IonSearchbar, IonList, IonItem,
     IonItemSliding, IonItemOptions, IonItemOption, IonLabel, IonBadge, IonIcon, IonFab, IonFabButton, IonRefresher,
-    IonRefresherContent, IonNote],
+    IonRefresherContent, IonNote, IonSegment, IonSegmentButton, IonButtons, IonButton],
 })
 export class ProductosPage {
   servicio = inject(ProductosService);
@@ -32,18 +32,37 @@ export class ProductosPage {
 
   /** Texto del buscador */
   texto = signal('');
-  /** Lista filtrada: se recalcula sola al escribir o al cambiar los productos */
+  /** Reto 1: categoría elegida en el ion-segment */
+  categorias = CATEGORIAS;
+  categoria = signal<Categoria | 'Todas'>('Todas');
+  /** Reto 2: criterio de orden */
+  orden = signal<'nombre' | 'precio'>('nombre');
+
+  /** Lista filtrada y ordenada: se recalcula sola al escribir, filtrar, ordenar o cambiar los productos */
   filtrados = computed(() => this.servicio.productos()
-    .filter((p) => p.nombre.toLowerCase().includes(this.texto().toLowerCase())));
+    .filter((p) => p.nombre.toLowerCase().includes(this.texto().toLowerCase()))
+    .filter((p) => this.categoria() === 'Todas' || p.categoria === this.categoria())
+    .slice()
+    .sort((a, b) => this.orden() === 'precio' ? a.precio - b.precio : a.nombre.localeCompare(b.nombre)));
 
   constructor() {
-    addIcons({ add, trash, cubeOutline });
+    addIcons({ add, trash, cubeOutline, swapVertical });
     this.servicio.cargar();   // LISTAR: lee los productos guardados en el celular
   }
 
   /** (ionInput): se ejecuta mientras escribes en el buscador */
   alBuscar(evento: CustomEvent): void {
     this.texto.set(evento.detail.value ?? '');
+  }
+
+  /** Reto 1: (ionChange) del segment */
+  alCambiarCategoria(evento: CustomEvent): void {
+    this.categoria.set(evento.detail.value);
+  }
+
+  /** Reto 2: alterna entre ordenar por nombre y por precio */
+  cambiarOrden(): void {
+    this.orden.update((o) => (o === 'nombre' ? 'precio' : 'nombre'));
   }
 
   /** ELIMINAR: primero pregunta, luego borra y vibra */

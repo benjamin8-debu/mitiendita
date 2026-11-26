@@ -15,6 +15,7 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { save } from 'ionicons/icons';
+import { Haptics, NotificationType } from '@capacitor/haptics';
 import { ProductosService } from '../../services/productos.service';
 import { CATEGORIAS, ProductoNuevo } from '../../models/producto';
 
@@ -56,6 +57,10 @@ export class RegistrarPage implements OnInit {
     if (error) {   // la validación falló: avisamos y no salimos
       (await this.toast.create({ message: error, duration: 2000, color: 'warning' })).present();
       return;
+    }
+    // Reto 4: si se registra un producto con poco stock, el celular vibra como advertencia
+    if (!this.editando && datos.stock < 5) {
+      await Haptics.notification({ type: NotificationType.Warning }).catch(() => {});
     }
     (await this.toast.create({ message: this.editando ? 'Cambios guardados ✔' : 'Producto registrado ✔', duration: 1500, color: 'success' })).present();
     this.datos = this.vacio();                  // limpia el formulario

@@ -1,9 +1,24 @@
 <!-- productos.page.html · Lista de productos -->
 <ion-header>
-  <ion-toolbar color="primary"><ion-title>MiTiendita</ion-title></ion-toolbar>
+  <ion-toolbar color="primary">
+    <ion-title>MiTiendita</ion-title>
+    <!-- Reto 2: ordenar por nombre o por precio -->
+    <ion-buttons slot="end">
+      <ion-button (click)="cambiarOrden()">
+        <ion-icon slot="start" name="swap-vertical"></ion-icon>{{ orden() === 'nombre' ? 'A-Z' : 'S/' }}
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
   <ion-toolbar>
     <!-- EVENTO (ionInput) + debounce: espera 250 ms después de la última tecla -->
     <ion-searchbar placeholder="Buscar producto" [debounce]="250" (ionInput)="alBuscar($event)"></ion-searchbar>
+  </ion-toolbar>
+  <!-- Reto 1: filtro por categoría -->
+  <ion-toolbar>
+    <ion-segment [scrollable]="true" [value]="categoria()" (ionChange)="alCambiarCategoria($event)">
+      <ion-segment-button value="Todas">Todas</ion-segment-button>
+      @for (c of categorias; track c) { <ion-segment-button [value]="c">{{ c }}</ion-segment-button> }
+    </ion-segment>
   </ion-toolbar>
 </ion-header>
 

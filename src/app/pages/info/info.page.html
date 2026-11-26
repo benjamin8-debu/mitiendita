@@ -15,6 +15,8 @@
       <ion-item><ion-label>¿Es un emulador?</ion-label><ion-note slot="end">{{ !nativo ? '—' : i.isVirtual ? 'Sí (emulador)' : 'No (celular real)' }}</ion-note></ion-item>
       <ion-item><ion-label>Batería</ion-label><ion-note slot="end">{{ bateria() ?? '—' }} %</ion-note></ion-item>
       <ion-item><ion-label>Productos guardados</ion-label><ion-note slot="end">{{ servicio.total() }}</ion-note></ion-item>
+      <!-- Reto 3: productos con stock menor a 5 (computed en el servicio) -->
+      <ion-item><ion-label>Stock bajo (menos de 5)</ion-label><ion-note slot="end" [color]="servicio.stockBajo() > 0 ? 'danger' : 'medium'">{{ servicio.stockBajo() }}</ion-note></ion-item>
     </ion-list>
   }
 
