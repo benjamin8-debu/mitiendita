@@ -1,0 +1,52 @@
+<!-- productos.page.html · Lista de productos -->
+<ion-header>
+  <ion-toolbar color="primary"><ion-title>MiTiendita</ion-title></ion-toolbar>
+  <ion-toolbar>
+    <!-- EVENTO (ionInput) + debounce: espera 250 ms después de la última tecla -->
+    <ion-searchbar placeholder="Buscar producto" [debounce]="250" (ionInput)="alBuscar($event)"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refrescar($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+
+  <!-- Resumen: datos calculados con computed() en el servicio -->
+  <div class="resumen">
+    <div><b>{{ servicio.total() }}</b><span>productos</span></div>
+    <div><b>{{ servicio.unidades() }}</b><span>unidades</span></div>
+    <div><b>{{ servicio.valorInventario() | currency: 'PEN' : 'S/ ' : '1.0-0' }}</b><span>en stock</span></div>
+  </div>
+
+  <ion-list>
+    <!-- @for repite el bloque por cada producto · track p.id = "DNI" de cada fila -->
+    @for (p of filtrados(); track p.id) {
+      <!-- ion-item-sliding: desliza la fila a la IZQUIERDA para ver "Eliminar" -->
+      <ion-item-sliding #fila>
+        <ion-item [routerLink]="['/producto', p.id]" [detail]="true">
+          <ion-label>
+            <h2>{{ p.nombre }}</h2>
+            <p>{{ p.categoria }} · {{ p.precio | currency: 'PEN' : 'S/ ' }}</p>
+          </ion-label>
+          <!-- Color dinámico: rojo si quedan menos de 5 -->
+          <ion-badge slot="end" [color]="p.stock < 5 ? 'danger' : 'success'">{{ p.stock }}</ion-badge>
+        </ion-item>
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="eliminar(p, fila)">
+            <ion-icon slot="icon-only" name="trash"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    } @empty {
+      <div class="vacio">
+        <ion-icon name="cube-outline"></ion-icon>
+        <p>No hay productos. Toca <b>+</b> para registrar el primero.</p>
+      </div>
+    }
+  </ion-list>
+  <p class="ion-text-center"><ion-note>Desliza un producto a la izquierda para eliminarlo</ion-note></p>
+
+  <!-- Botón flotante: lleva a la pestaña Registrar -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button color="tertiary" routerLink="/tabs/registrar"><ion-icon name="add"></ion-icon></ion-fab-button>
+  </ion-fab>
+</ion-content>

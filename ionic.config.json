@@ -1,0 +1,7 @@
+{
+  "name": "mitiendita",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
